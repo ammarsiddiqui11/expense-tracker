@@ -1,0 +1,7 @@
+How to run:-
+1. install dependencies 
+2. run the backend using nodemon(npm run dev)
+3. run the frontend (npm run dev),note:-Run the frontend and backend simultaneously by splitting the terminal
+4. you will be redirected to login page,if you havent logged in before signup 
+5. to validate the signup it will ask for the otp which would be in you inbox of the given mail(currently not working due to some issue with the sandbox mail service)
+6. as the mail service not working you will get the otp in your backend console,paste the otp and you'll be redirected to signin page after signin you can access the dashboard
