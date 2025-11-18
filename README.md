@@ -1,5 +1,6 @@
 How to run:-
-1. install dependencies 
+1. install dependencies (1: git init 2: npm install axios bcryptjs cors dotenv express jsonwebtoken mongoose nodemailer
+3:npm install -D nodemon)
 2. run the backend using nodemon(npm run dev)
 3. run the frontend (npm run dev),note:-Run the frontend and backend simultaneously by splitting the terminal
 4. you will be redirected to login page,if you havent logged in before signup 
