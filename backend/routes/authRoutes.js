@@ -13,6 +13,10 @@ router.post('/forgot-password', ctrl.forgotPassword);
 router.post("/verify-forgot-otp", ctrl.verifyForgotOtp);
 router.post('/reset-password', ctrl.resetPassword);
 router.put("/change-password", protect,ctrl.changePassword);
+router.put("/change-password/request-otp", protect, ctrl.requestChangePasswordOTP);
+router.post("/change-password/verify-otp", ctrl.verifyChangePasswordOTP);
+
+
 
 // example protected route to get current user
 router.get('/me', auth.protect, async (req, res) => {

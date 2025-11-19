@@ -256,3 +256,81 @@ exports.changePassword = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+exports.requestChangePasswordOTP = async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ message: "Old and new password required" });
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) return res.status(400).json({ message: "Incorrect old password" });
+
+    // generate OTP
+    const otp = generateOTP();
+
+    // hash new password now (safer)
+    const hashedNewPassword = await bcrypt.hash(newPassword, 12);
+
+    user.otp = otp;
+    user.otpExpiry = new Date(Date.now() + OTP_TTL_MIN * 60 * 1000);
+    user.tempPassword = hashedNewPassword;  // store hashed new password temporarily
+
+    await user.save();
+    await sendOTP(user.email, otp, "change-password");
+
+    res.json({ message: "OTP sent to email", userId: user._id });
+
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.verifyChangePasswordOTP = async (req, res) => {
+  try {
+    const { userId, otp } = req.body;
+
+    if (!userId || !otp) {
+      return res.status(400).json({ message: "userId and otp required" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (!user.otp || !user.otpExpiry || !user.tempPassword) {
+      return res.status(400).json({ message: "No OTP request found" });
+    }
+
+    if (user.otp !== otp) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    if (user.otpExpiry < Date.now()) {
+      return res.status(400).json({ message: "OTP expired" });
+    }
+
+    // update password from stored hashed password
+    user.password = user.tempPassword;
+
+    // cleanup
+    user.otp = null;
+    user.otpExpiry = null;
+    user.tempPassword = null;
+
+    await user.save();
+
+    res.json({ message: "Password changed successfully" });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+

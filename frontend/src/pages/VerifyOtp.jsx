@@ -32,11 +32,17 @@ export default function VerifyOtp() {
         return;
       }
 
+      if (flow === "change") {
+      await api.post("/auth/change-password/verify-otp", { userId, otp });
+      alert("Password updated successfully!");
+      navigate("/profile");
+      return;
+    }
+
       // -----------------------------
       // SIGNUP FLOW
       // -----------------------------
       const res = await api.post("/auth/verify-signup", { userId, otp });
-
       saveToken(res.data.token);
       navigate("/");
 
