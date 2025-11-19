@@ -7,8 +7,9 @@ function generateOTP(len = 6) {
 }
 
 async function sendOTP(email, otp, context = '') {
-    console.log(otp)
+  
   try {
+    console.log(otp)
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: process.env.SMTP_PORT,
@@ -16,7 +17,10 @@ async function sendOTP(email, otp, context = '') {
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
-      }
+      },
+      tls: {
+        rejectUnauthorized: false, // <-- FIX
+      },
     });
 
     const info = await transporter.sendMail({
